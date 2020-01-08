@@ -20,3 +20,4 @@ include/stamp-h1
 *.o
 tcpclient
 tcpserver
+.vscode
