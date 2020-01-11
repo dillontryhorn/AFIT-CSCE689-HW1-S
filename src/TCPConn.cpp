@@ -43,7 +43,7 @@ int TCPConn::sendText(const char *msg, int size) {
 }
 
 void TCPConn::handleConnection() {
-    std::cout << this->_buffer << "\n";
+    //std::cout << this->_buffer << "\n";
     
     TCPConn::getMenuChoice(); //sends message back  
 }
