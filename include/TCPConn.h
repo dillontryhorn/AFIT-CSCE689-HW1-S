@@ -35,6 +35,7 @@ public:
    void getMenuChoice();
    void setPassword();
    void changePassword();
+   void setNonBlocking();
    
    bool getUserInput(std::string &cmd);
 

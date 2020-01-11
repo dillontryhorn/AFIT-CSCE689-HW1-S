@@ -31,15 +31,21 @@ bool TCPConn::acceptConn(SocketFD &server) {
 }
 
 int TCPConn::sendText(const char *msg) {
-    return 0;
+    int success = write( getConnFD(), this->_buffer, strlen(this->_buffer) );
+    if( success < 0 )
+        throw socket_error("ERROR! Message could not be written.");
 }
 
 int TCPConn::sendText(const char *msg, int size) {
-    return 0;
+    int success = write( getConnFD(), msg, size );
+    if( success < 0 )
+        throw socket_error("ERROR! Message could not be written.");
 }
 
 void TCPConn::handleConnection() {
-    //TCPConn::getUserInput( msg );
+    std::cout << this->_buffer << "\n";
+    
+    TCPConn::getMenuChoice(); //sends message back  
 }
 
 void TCPConn::startAuthentication() {
@@ -61,35 +67,32 @@ void TCPConn::sendMenu() {
 }
 
 void TCPConn::getMenuChoice() {
-    /* int msg = -1;
+    if( !strcmp(this->_buffer, "hello") )
+        TCPConn::sendText("Hello! I hope you are doing well.", 34);
 
-    if( !strcmp(command, "hello") )
-        msg = write(this->accept_socket, "Hello! I hope you are doing well.", 34);
+    else if( !strcmp(this->_buffer, "1") )
+        TCPConn::sendText("Did you know? Many species of birds can fly.", 45);
 
-    else if( !strcmp(command, "1") )
-        msg = write(this->accept_socket, "Did you know? Many species of birds can fly.", 45);
+    else if( !strcmp(this->_buffer, "2") )
+        TCPConn::sendText("My grandmother's name was Maureen.", 35);
 
-    else if( !strcmp(command, "2") )
-        msg = write(this->accept_socket, "My grandmother's name was Maureen.", 35);
+    else if( !strcmp(this->_buffer, "3") )
+        TCPConn::sendText("My social security number is 347-MY-1337", 41);
 
-    else if( !strcmp(command, "3") )
-        msg = write(this->accept_socket, "My social security number is 347-MY-1337", 41);
+    else if( !strcmp(this->_buffer, "4") )
+        TCPConn::sendText("I wish to live in New York City one day and eat a big apple!", 61);
 
-    else if( !strcmp(command, "4") )
-        msg = write(this->accept_socket, "I wish to live in New York City one day and eat a big apple!", 61);
+    else if( !strcmp(this->_buffer, "5") )
+        TCPConn::sendText("At a given time, I have $0 in my wallet.", 41);
 
-    else if( !strcmp(command, "5") )
-        msg = write(this->accept_socket, "At a given time, I have $0 in my wallet.", 41);
+    else if( !strcmp(this->_buffer, "passwd") )
+        TCPConn::sendText("Not implemented yet. Cannot change password.", 45);
 
-    else if( !strcmp(command, "passwd") )
-        msg = write(this->accept_socket, "Not implemented yet. Cannot change password.", 45);
-
-    else if( !strcmp(command, "menu") )
-        msg = write(this->accept_socket, "List of commands:\nhello\nmenu\n1\n2\n3\n4\n5\npasswd\nexit", 51);
-
+    else if( !strcmp(this->_buffer, "menu") )
+        TCPConn::sendText("List of commands:\nhello\nmenu\n1\n2\n3\n4\n5\npasswd\nexit", 51);
+        
     else
-        msg = write(this->accept_socket, "INVALID COMMAND", 16);
- */
+        TCPConn::sendText("INVALID COMMAND", 16);
 }
 
 void TCPConn::setPassword() {
@@ -113,6 +116,7 @@ bool TCPConn::isConnected() {
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     int msg;
+    memset(&this->_buffer[0], 0, sizeof(this->_buffer));
     if( (msg = read( getConnFD() , this->_buffer, 99) ) == 0 )   
     {   
         getpeername( getConnFD(), (struct sockaddr*)&address, (socklen_t*)&addrlen ); 
@@ -121,4 +125,8 @@ bool TCPConn::isConnected() {
         return false;
     }
     return true;
+}
+
+void TCPConn::setNonBlocking() {
+    this->_connfd.setNonBlocking();
 }

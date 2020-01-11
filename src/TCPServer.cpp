@@ -71,6 +71,7 @@ void TCPServer::listenSvr() {
             if( this->_connlist.size() < max_connections )
             {
                 std::unique_ptr<TCPConn> new_connection = TCPConn::New();
+                new_connection->setNonBlocking();
                 if( !new_connection->acceptConn( this->_sockFD ) )
                     throw socket_error("ERROR! Connection could not be established.");
                 new_connection->sendMenu();

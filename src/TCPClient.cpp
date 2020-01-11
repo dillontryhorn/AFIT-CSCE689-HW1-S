@@ -14,6 +14,7 @@ TCPClient::TCPClient() {
     this->_stdinFD = stdin_fd;
     if( this->_stdinFD.getSockFD() < 0 )
         throw socket_error("ERROR! Client socket could not be opened.");
+    this->_stdinFD.setNonBlocking();
 }
 
 /**********************************************************************************************
@@ -49,7 +50,7 @@ void TCPClient::handleConnection() {
 
     while(1)
     {
-        if( (msg = read( this->_stdinFD.getSockFD() , this->_buffer, socket_bufsize-1) ) == 0 )
+        if( (msg = read( this->_stdinFD.getSockFD(), this->_buffer, socket_bufsize-1) ) == 0 )
         {   
             std::cout << "Connection refused.\n";
             break;
@@ -59,7 +60,7 @@ void TCPClient::handleConnection() {
         std::cout << this->_buffer << '\n';
 
         std::cout << ">> ";
-        bzero(this->_buffer, stdin_bufsize);
+        memset(&this->_buffer[0], 0, sizeof(this->_buffer));
         std::cin >> this->_buffer;
         if( !strcmp(this->_buffer, "exit") )
             break;
