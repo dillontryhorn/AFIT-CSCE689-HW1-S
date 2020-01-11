@@ -1,10 +1,9 @@
 #ifndef TCPCLIENT_H
 #define TCPCLIENT_H
 
-#include <string>
 #include "Client.h"
 
-#include <netinet/in.h>
+#include "TCPConn.h"
 
 // The amount to read in before we send a packet
 const unsigned int stdin_bufsize = 50;
@@ -22,9 +21,8 @@ public:
    virtual void closeConn();
 
 private:
-   int client_socket = 0, connected = 0;
-   struct sockaddr_in server_address;
-   struct hostent *server = nullptr;
+   SocketFD _stdinFD;
+   char _buffer[socket_bufsize];
 };
 
 

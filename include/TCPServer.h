@@ -3,9 +3,11 @@
 
 #include "Server.h"
 
-#include <netinet/in.h>
+#include <list>
+#include <memory>
+#include "TCPConn.h"
 
-const unsigned int socket_bufsize = 100;
+const int max_connections = 2;
 
 class TCPServer : public Server 
 {
@@ -16,14 +18,10 @@ public:
    void bindSvr(const char *ip_addr, unsigned short port);
    void listenSvr();
    void shutdown();
-   void runCommand(const char *command);
 
 private:
-   int server_socket, accept_socket;
-   struct sockaddr_in server_address, client_address;
-   socklen_t client_length;
-   char buffer[socket_bufsize];
+   SocketFD _sockFD;
+   std::list<std::unique_ptr<TCPConn>> _connlist;
 };
-
 
 #endif

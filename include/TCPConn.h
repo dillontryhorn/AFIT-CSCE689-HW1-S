@@ -3,15 +3,26 @@
 
 #include "FileDesc.h"
 
+#include <memory>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+
 const int max_attempts = 2;
+const int bufsize = 100;
 
 class TCPConn 
 {
 public:
    TCPConn();
    ~TCPConn();
+   static std::unique_ptr<TCPConn> New();
 
-   bool accept(SocketFD &server);
+   bool acceptConn(SocketFD &server);
 
    int sendText(const char *msg);
    int sendText(const char *msg, int size);
@@ -30,7 +41,8 @@ public:
    void disconnect();
    bool isConnected();
 
-   unsigned long getIPAddr() { return _connfd.getIPAddr(); };
+   sockaddr_in getIPAddr() { return _connfd.getIPAddr(); };
+   int getConnFD() { return _connfd.getSockFD(); };
 
 private:
 
@@ -46,6 +58,8 @@ private:
    std::string _inputbuf;
 
    std::string _newpwd; // Used to store user input for changing passwords
+
+   char _buffer[bufsize];
 
    int _pwd_attempts = 0;
 };
