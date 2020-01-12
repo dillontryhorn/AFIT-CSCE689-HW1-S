@@ -92,7 +92,7 @@ void TCPConn::getMenuChoice() { //All standard menu choices
         TCPConn::sendText("List of commands:\nhello\nmenu\n1\n2\n3\n4\n5\npasswd\nexit", 51);
         
     else
-        TCPConn::sendText("INVALID COMMAND", 16);
+        TCPConn::sendText("INVALID COMMAND\nList of commands:\nhello\nmenu\n1\n2\n3\n4\n5\npasswd\nexit", 67);
 }
 
 void TCPConn::setPassword() {
