@@ -11,10 +11,9 @@
 
 TCPClient::TCPClient() {
     SocketFD stdin_fd;
-    this->_stdinFD = stdin_fd;
-    if( this->_stdinFD.getSockFD() < 0 )
+    if( stdin_fd.getSockFD() < 0 )
         throw socket_error("ERROR! Client socket could not be opened.");
-    this->_stdinFD.setNonBlocking();
+    this->_stdinFD = stdin_fd;
 }
 
 /**********************************************************************************************
@@ -34,7 +33,7 @@ TCPClient::~TCPClient() {
  **********************************************************************************************/
 
 void TCPClient::connectTo(const char *ip_addr, unsigned short port) {
-    this->_stdinFD.connectTo(ip_addr, port);
+    this->_stdinFD.connectTo( ip_addr, port );
 }
 
 /**********************************************************************************************
@@ -47,10 +46,9 @@ void TCPClient::connectTo(const char *ip_addr, unsigned short port) {
 
 void TCPClient::handleConnection() {
     int msg = 0;
-
     while(1)
     {
-        if( (msg = read( this->_stdinFD.getSockFD(), this->_buffer, socket_bufsize-1) ) == 0 )
+        if( (msg = read( this->_stdinFD.getSockFD(), this->_buffer, socket_bufsize-1 ) ) == 0 ) //Always read first
         {   
             std::cout << "Connection refused.\n";
             break;
@@ -60,11 +58,11 @@ void TCPClient::handleConnection() {
         std::cout << this->_buffer << '\n';
 
         std::cout << ">> ";
-        memset(&this->_buffer[0], 0, sizeof(this->_buffer));
+        memset( &this->_buffer[0], 0, sizeof(this->_buffer) ); //Make sure buffer is empty
         std::cin >> this->_buffer;
-        if( !strcmp(this->_buffer, "exit") )
+        if( !strcmp(this->_buffer, "exit") ) //Disconnecting
             break;
-        msg = write(this->_stdinFD.getSockFD(), this->_buffer, strlen(this->_buffer));
+        msg = write( this->_stdinFD.getSockFD(), this->_buffer, strlen(this->_buffer) ); //Always write after read
         if( msg < 0 )
             throw socket_error("ERROR! Message could not be written.");
     } 

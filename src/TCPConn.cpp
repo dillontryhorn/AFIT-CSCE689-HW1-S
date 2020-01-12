@@ -22,30 +22,30 @@ bool TCPConn::acceptConn(SocketFD &server) {
     int addrlen = sizeof( address );
     int new_conn;
     if ( ( new_conn = accept( server.getSockFD(), (struct sockaddr *)&address, (socklen_t*)&addrlen ) ) < 0 )   
-        return false;
-    this->_connfd.setSockFD( new_conn );
+        return false; //Connection failed
+    this->_connfd.setSockFD( new_conn ); //Set and print info to server admin
     std::cout << "NEW CONNECTION SUCCESS, SocketFD: " << getConnFD();
     std::cout << ", IP: " << inet_ntoa(address.sin_addr);
     std::cout << ", Port: " << ntohs(address.sin_port) << std::endl;
     return true;
 }
 
-int TCPConn::sendText(const char *msg) {
-    int success = write( getConnFD(), this->_buffer, strlen(this->_buffer) );
+int TCPConn::sendText(const char *msg) { //Simpler than method below
+    int success = write( getConnFD(), msg, strlen(msg) );
     if( success < 0 )
         throw socket_error("ERROR! Message could not be written.");
 }
 
-int TCPConn::sendText(const char *msg, int size) {
+int TCPConn::sendText(const char *msg, int size) { //More precise
     int success = write( getConnFD(), msg, size );
     if( success < 0 )
         throw socket_error("ERROR! Message could not be written.");
 }
 
 void TCPConn::handleConnection() {
-    //std::cout << this->_buffer << "\n";
-    
-    TCPConn::getMenuChoice(); //sends message back  
+    //Add authentication here later
+
+    TCPConn::getMenuChoice(); //Sends message back  
 }
 
 void TCPConn::startAuthentication() {
@@ -60,13 +60,13 @@ void TCPConn::getPasswd() {
     //TO BE IMPLEMENTED IN HW2
 }
 
-void TCPConn::sendMenu() {
+void TCPConn::sendMenu() { //Banner
     int msg = write(getConnFD(), "Welcome to Dillon Tryhorn's Server.\nList of commands:\nhello\nmenu\n1\n2\n3\n4\n5\npasswd\nexit", 87);
     if( msg < 0 )
         throw socket_error("ERROR! Message failed to send.");
 }
 
-void TCPConn::getMenuChoice() {
+void TCPConn::getMenuChoice() { //All standard menu choices
     if( !strcmp(this->_buffer, "hello") )
         TCPConn::sendText("Hello! I hope you are doing well.", 34);
 
@@ -104,7 +104,7 @@ void TCPConn::changePassword() {
 }
 
 bool TCPConn::getUserInput(std::string &cmd) {
-    return false;
+    return false; //Unused
 }
 
 void TCPConn::disconnect() {
@@ -116,17 +116,13 @@ bool TCPConn::isConnected() {
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     int msg;
-    memset(&this->_buffer[0], 0, sizeof(this->_buffer));
-    if( (msg = read( getConnFD() , this->_buffer, 99) ) == 0 )   
+    memset(&this->_buffer[0], 0, sizeof(this->_buffer)); //Make sure buffer is clear
+    if( (msg = read( getConnFD() , this->_buffer, 99) ) == 0 ) //Read in buffer to see if connection is still open  
     {   
-        getpeername( getConnFD(), (struct sockaddr*)&address, (socklen_t*)&addrlen ); 
+        getpeername( getConnFD(), (struct sockaddr*)&address, (socklen_t*)&addrlen ); //Display client info
         std::cout << "Host disconnected. IP: " << inet_ntoa(address.sin_addr);
         std::cout << " Port: " << ntohs(address.sin_port) << std::endl;
         return false;
     }
     return true;
-}
-
-void TCPConn::setNonBlocking() {
-    this->_connfd.setNonBlocking();
 }

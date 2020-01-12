@@ -7,7 +7,7 @@
 #include <memory>
 #include "TCPConn.h"
 
-const int max_connections = 2;
+const int max_connections = 3;
 
 class TCPServer : public Server 
 {

@@ -5,8 +5,8 @@
 
 #include "TCPConn.h"
 
-// The amount to read in before we send a packet
-const unsigned int stdin_bufsize = 50;
+// Unused
+// const unsigned int stdin_bufsize = 50;
 const unsigned int socket_bufsize = 100;
 
 class TCPClient : public Client

@@ -4,9 +4,11 @@
 #include "exceptions.h"
 #include <stdexcept>
 
-//http://www.linuxhowtos.org/C_C++/socket.htm
-//https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/
-
+/*
+ * TCPServer::listenSvr() uses the modified algorithm from the website given below to
+ * select which connection to handle at a given time and when to create a new connection.
+ * https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/
+ */
 
 TCPServer::TCPServer() {
 
@@ -41,17 +43,18 @@ void TCPServer::bindSvr(const char *ip_addr, short unsigned int port) {
 
 void TCPServer::listenSvr() {
     fd_set readfd;
-    struct sockaddr_in address;
-    int activity, max_fd, fd, new_fd;  
+    int activity, max_fd, fd;
 
     this->_sockFD.startListen();
+    std::cout << "Maximum Connections Allowed: " << max_connections << std::endl; //Notify server admin
 
     while(true)
     {
-        FD_ZERO( &readfd );
-        FD_SET( this->_sockFD.getSockFD(), &readfd ); 
+        FD_ZERO( &readfd ); //Clear socket list
+        FD_SET( this->_sockFD.getSockFD(), &readfd ); //Add server socket
         max_fd = this->_sockFD.getSockFD();
 
+        //Add current connections to socket list
         for( auto const& connection : this->_connlist )
         {
             fd = connection->getConnFD();
@@ -61,6 +64,7 @@ void TCPServer::listenSvr() {
                 max_fd = fd;
         }
 
+        //Select connection to observe
         activity = select( max_fd + 1 , &readfd , NULL , NULL , NULL );
 
         if( ( activity < 0 ) && ( errno != EINTR ) )   
@@ -68,16 +72,15 @@ void TCPServer::listenSvr() {
 
         if( FD_ISSET(this->_sockFD.getSockFD(), &readfd) )   
         {   
-            if( this->_connlist.size() < max_connections )
+            if( this->_connlist.size() < max_connections ) //Allow connection to establish
             {
                 std::unique_ptr<TCPConn> new_connection = TCPConn::New();
-                new_connection->setNonBlocking();
                 if( !new_connection->acceptConn( this->_sockFD ) )
                     throw socket_error("ERROR! Connection could not be established.");
                 new_connection->sendMenu();
                 this->_connlist.push_back( std::move( new_connection ) );
             }
-            else //Refuse Connection
+            else //Refuse connection
             {
                 std::unique_ptr<TCPConn> new_connection = TCPConn::New();
                 new_connection->acceptConn( this->_sockFD );
@@ -91,14 +94,14 @@ void TCPServer::listenSvr() {
             fd = (*connection)->getConnFD();
             if( FD_ISSET( fd, &readfd ) )
             {
-                if( (*connection)->isConnected() )
-                    (*connection)->handleConnection();
+                if( (*connection)->isConnected() ) //Performs a read and places input into buffer
+                    (*connection)->handleConnection(); //Uses the buffer from last line
                 else //Remove connection from _connlist
                 {
                     auto new_it = connection;
                     ++new_it;
                     this->_connlist.remove( (*connection) );
-                    connection = new_it;
+                    connection = new_it; //Perform this operation to avoid undefined behavior
                 }
             }
         }

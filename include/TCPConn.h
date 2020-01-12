@@ -35,9 +35,8 @@ public:
    void getMenuChoice();
    void setPassword();
    void changePassword();
-   void setNonBlocking();
    
-   bool getUserInput(std::string &cmd);
+   bool getUserInput(std::string &cmd); //unused
 
    void disconnect();
    bool isConnected();
@@ -55,8 +54,6 @@ private:
    SocketFD _connfd;
  
    std::string _username; // The username this connection is associated with
-
-   std::string _inputbuf;
 
    std::string _newpwd; // Used to store user input for changing passwords
 
