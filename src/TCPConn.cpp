@@ -67,28 +67,28 @@ void TCPConn::sendMenu() { //Banner
 }
 
 void TCPConn::getMenuChoice() { //All standard menu choices
-    if( !strcmp(this->_buffer, "hello") )
+    if( !strncmp(this->_buffer, "hello", 6) )
         TCPConn::sendText("Hello! I hope you are doing well.", 34);
 
-    else if( !strcmp(this->_buffer, "1") )
+    else if( !strncmp(this->_buffer, "1", 2) )
         TCPConn::sendText("Did you know? Many species of birds can fly.", 45);
 
-    else if( !strcmp(this->_buffer, "2") )
+    else if( !strncmp(this->_buffer, "2", 2) )
         TCPConn::sendText("My grandmother's name was Maureen.", 35);
 
-    else if( !strcmp(this->_buffer, "3") )
+    else if( !strncmp(this->_buffer, "3", 2) )
         TCPConn::sendText("My social security number is 347-MY-1337", 41);
 
-    else if( !strcmp(this->_buffer, "4") )
+    else if( !strncmp(this->_buffer, "4", 2) )
         TCPConn::sendText("I wish to live in New York City one day and eat a big apple!", 61);
 
-    else if( !strcmp(this->_buffer, "5") )
+    else if( !strncmp(this->_buffer, "5", 2) )
         TCPConn::sendText("At a given time, I have $0 in my wallet.", 41);
 
-    else if( !strcmp(this->_buffer, "passwd") )
+    else if( !strncmp(this->_buffer, "passwd", 7) )
         TCPConn::sendText("Not implemented yet. Cannot change password.", 45);
 
-    else if( !strcmp(this->_buffer, "menu") )
+    else if( !strncmp(this->_buffer, "menu", 5) )
         TCPConn::sendText("List of commands:\nhello\nmenu\n1\n2\n3\n4\n5\npasswd\nexit", 51);
         
     else

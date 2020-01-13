@@ -60,7 +60,7 @@ void TCPClient::handleConnection() {
         std::cout << ">> ";
         memset( &this->_buffer[0], 0, sizeof(this->_buffer) ); //Make sure buffer is empty
         std::cin >> this->_buffer;
-        if( !strcmp(this->_buffer, "exit") ) //Disconnecting
+        if( !strncmp(this->_buffer, "exit", 5) ) //Disconnecting
             break;
         msg = write( this->_stdinFD.getSockFD(), this->_buffer, strlen(this->_buffer) ); //Always write after read
         if( msg < 0 )
