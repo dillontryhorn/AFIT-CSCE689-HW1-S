@@ -16,3 +16,19 @@ Commands not on this list should display an error message.
 Recommend creating additional classes for modularity and reusability. Add additional files
 to src/Makefile.am and rerun autoreconf and ./configure to integrate support for your new
 files. 
+
+Homework 2:
+
+Students will add security features to their Homework 1 client/server model. Specifications include:
+
+A file containing usernames and password hashes of authorized users (using the Argon2 hash algorithm)
+A command line program to add users/passwords to the password file
+A whitelist of allowed IP addresses (stored in a file)
+The server should disconnect a connection not listed on the whitelist as soon as possible
+Users should get two chances to enter the correct password before they are disconnected
+The server should log events to a file with a timestamp. Events include, but are not limited to:
+    Successful login attempts - account name, source IP address
+    Failed login attempts - same info as above
+    Connection attempts from sites not on the whitelist
+Once successfully connected, users should be able to change their password by entering their new password twice. 
+Code should use secure software techniques - do not facilitate buffer overflows!
