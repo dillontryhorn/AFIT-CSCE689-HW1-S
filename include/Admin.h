@@ -10,6 +10,9 @@ class Admin
         Admin() = default;
         ~Admin() = default;
 
+        void addWhitelistIP( std::string ip_addr );
+        void removeWhitelistIP( std::string ip_addr );
+
         void addUser( std::string username, std::string password );
         void removeUser( std::string username );
 
