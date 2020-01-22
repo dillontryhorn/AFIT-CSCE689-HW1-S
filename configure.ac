@@ -24,10 +24,10 @@ AC_TYPE_UINT8_T
 # Checks for library functions.
 AC_CHECK_FUNCS([bzero socket strtol select])
 # For Homework 2
-#AC_CHECK_LIB([argon2], [argon2i_hash_raw], [], [
-#   echo "You are missing libargon2. It is required for password authentication."
-#   exit -1;
-#   ])
+AC_CHECK_LIB([argon2], [argon2i_hash_raw], [], [
+   echo "You are missing libargon2. It is required for password authentication."
+   exit -1;
+   ])
 
 AM_INIT_AUTOMAKE([subdir-objects -Wall])
 AC_CONFIG_FILES([Makefile

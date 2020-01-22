@@ -23,3 +23,7 @@ tcpserver
 tcpadmin
 .vscode
 server_passwords.txt
+server_whitelist.txt
+passwd
+whitelist
+config.h.in~
