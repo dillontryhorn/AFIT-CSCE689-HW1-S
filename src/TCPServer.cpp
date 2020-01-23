@@ -76,9 +76,12 @@ void TCPServer::listenSvr() {
             {
                 std::unique_ptr<TCPConn> new_connection = TCPConn::New();
                 if( !new_connection->acceptConn( this->_sockFD ) )
-                    throw socket_error("ERROR! Connection could not be established.");
-                new_connection->sendMenu();
-                this->_connlist.push_back( std::move( new_connection ) );
+                    std::cout << "Blocked Nonwhitelisted IP" << std::endl;
+                else
+                {
+                    new_connection->startAuthentication();
+                    this->_connlist.push_back( std::move( new_connection ) );
+                }
             }
             else //Refuse connection
             {

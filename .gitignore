@@ -27,3 +27,4 @@ server_whitelist.txt
 passwd
 whitelist
 config.h.in~
+my_adduser

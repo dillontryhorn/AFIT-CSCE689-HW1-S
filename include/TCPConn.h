@@ -2,6 +2,7 @@
 #define TCPCONN_H
 
 #include "FileDesc.h"
+#include "Admin.h"
 
 #include <memory>
 #include <stdio.h>
@@ -35,8 +36,7 @@ public:
    void getMenuChoice();
    void setPassword();
    void changePassword();
-   
-   bool getUserInput(std::string &cmd); //unused
+   void sleep();
 
    void disconnect();
    bool isConnected();
@@ -60,6 +60,8 @@ private:
    char _buffer[bufsize];
 
    int _pwd_attempts = 0;
+
+   Admin _server_admin;
 };
 
 

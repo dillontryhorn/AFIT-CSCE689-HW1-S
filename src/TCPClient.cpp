@@ -57,14 +57,20 @@ void TCPClient::handleConnection() {
             throw socket_error("ERROR! Server message could not be read.");
         std::cout << this->_buffer << '\n';
 
-        std::cout << ">> ";
-        memset( &this->_buffer[0], 0, sizeof(this->_buffer) ); //Make sure buffer is empty
-        std::cin >> this->_buffer;
-        if( !strncmp(this->_buffer, "exit", 5) ) //Disconnecting
+        std::string disconnect( this->_buffer );
+        if( disconnect.find("Disconnecting") == std::string::npos )
+        {
+            std::cout << ">> ";
+            memset( &this->_buffer[0], 0, sizeof(this->_buffer) ); //Make sure buffer is empty
+            std::cin >> this->_buffer;
+            if( !strncmp(this->_buffer, "exit", 5) ) //Disconnecting
+                break;
+            msg = write( this->_stdinFD.getSockFD(), this->_buffer, strlen(this->_buffer) ); //Always write after read
+            if( msg < 0 )
+                throw socket_error("ERROR! Message could not be written.");
+        }
+        else
             break;
-        msg = write( this->_stdinFD.getSockFD(), this->_buffer, strlen(this->_buffer) ); //Always write after read
-        if( msg < 0 )
-            throw socket_error("ERROR! Message could not be written.");
     } 
 }
 
