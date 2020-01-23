@@ -19,16 +19,24 @@ files.
 
 Homework 2:
 
-Students will add security features to their Homework 1 client/server model. Specifications include:
+Students will provide a server/client architecture that provides the same functionality as in Homework 1. In addition, the homework 2 server should add the following functionality: 
 
-A file containing usernames and password hashes of authorized users (using the Argon2 hash algorithm)
-A command line program to add users/passwords to the password file
-A whitelist of allowed IP addresses (stored in a file)
-The server should disconnect a connection not listed on the whitelist as soon as possible
-Users should get two chances to enter the correct password before they are disconnected
-The server should log events to a file with a timestamp. Events include, but are not limited to:
-    Successful login attempts - account name, source IP address
-    Failed login attempts - same info as above
-    Connection attempts from sites not on the whitelist
-Once successfully connected, users should be able to change their password by entering their new password twice. 
+New connections should be compared against a whitelist of allowed IP addresses and disconnected as early in the process as possible if not on the list
+IP addresses should be stored in the file 'whitelist' in a simple newline-separated list
+It is fine to use manual editing of the file (no need for your server to be able to edit the list)
+New connections should be asked for their username and immediate disconnected (with appropriate error message) if the username is not recognized
+Recognized usernames should be prompted for their passwords and given two attempts to get it right before being disconnected
+Passwords should be stored in an Argon2 hash (need libraries argon2-1 and argon2-dev installed)
+Min hash size is 32 bytes with a randomized 16 byte Salt (Pepper optional)
+Each user should have their own unique Salt
+adduser_main.cpp should include code to add a user and set their password using the command line and binary my_adduser
+Events should be logged to a file called server.log with a time/date timestamp to the second. The following events should be logged (don't forget to flush buffered FDs after writing):
+Server startup
+New connections that are not on the whitelist (show IP)
+New connections that are on the whitelist (show IP)
+Usernames entered that are not recognized (show username, IP)
+Users who failed to input their password twice (show username, IP)
+Successful logins (show username, IP)
+Disconnects (show username, IP)
+Once successfully connected, users should be able to change their password by entering their new password twice (Optional: hide user typing, though this is not trivial over network connections)
 Code should use secure software techniques - do not facilitate buffer overflows!
