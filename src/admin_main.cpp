@@ -8,8 +8,9 @@ using namespace std;
 
 void displayHelp(const char *execname) {
     cout << "Improper syntax. All possible examples shown below." << endl;
-    cout << execname << " user add <username> <password>" << endl;
+    cout << execname << " user add <username>" << endl;
     cout << execname << " user remove <username>" << endl;
+    cout << execname << " user passwd <username>" << endl;
     cout << execname << " ip add <IP Address>" << endl;
     cout << execname << " ip remove <IP Address>" << endl;
 }
@@ -19,26 +20,17 @@ int main(int argc, char *argv[])
     string option = "", username = "", password = "", ip_addr = "";
 
     //Improper syntax
-    if( argc < 4 || argc > 5 ) 
+    if( argc != 4 ) 
     {
         displayHelp(argv[0]);
-        exit(0);
+        exit(-1);
     }
 
     if( !strncmp( argv[1], "user", 5 ) )
     {
         //Read in parameters from command line
-        if( argc == 4 && !strncmp(argv[2], "remove", 7) )
-        {
-            option = argv[2];
-            username = argv[3];
-        }
-        else if( argc == 5 && !strncmp(argv[2], "add", 4) )
-        {
-            option = argv[2];
-            username = argv[3];
-            password = argv[4];
-        }
+        option = argv[2];
+        username = argv[3];
 
         Admin server_admin;
 
@@ -46,7 +38,12 @@ int main(int argc, char *argv[])
         {
             try //Add user
             {
-                server_admin.addUser( username, password );
+                if( !server_admin.checkUser( username ) )
+                {
+                    server_admin.addUser( username );
+                }
+                else
+                    cout << username << " already exists." << endl;
             } catch (runtime_error &e)
             {
                 cerr << "Unable to add user: " << e.what() << endl;
@@ -57,10 +54,23 @@ int main(int argc, char *argv[])
         {
             try //Remove user
             {
-                server_admin.removeUser( username );
+                if( server_admin.removeUser( username ) )
+                    cout << "Removed " << username << endl;
             } catch (runtime_error &e)
             {
                 cerr << "Unable to remove user: " << e.what() << endl;
+                return -1;
+            }
+        }
+        else if( option.compare("passwd") == 0)
+        {
+            try //Change user password
+            {
+                server_admin.changePassword( username );
+                cout << "Password changed for " << username << endl;
+            } catch (runtime_error &e)
+            {
+                cerr << "Unable to change user password: " << e.what() << endl;
                 return -1;
             }
         }
@@ -87,7 +97,10 @@ int main(int argc, char *argv[])
         {
             try //Add IP to Whitelist
             {
-                server_admin.addWhitelistIP( ip_addr );
+                if( !server_admin.checkWhitelistIP( ip_addr ) )
+                    server_admin.addWhitelistIP( ip_addr );
+                else
+                    cout << ip_addr << " is already whitelisted." << endl;
             } catch (runtime_error &e)
             {
                 cerr << "Unable to add IP address: " << e.what() << endl;
