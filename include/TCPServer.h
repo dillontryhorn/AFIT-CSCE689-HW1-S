@@ -2,6 +2,7 @@
 #define TCPSERVER_H
 
 #include "Server.h"
+#include "Admin.h"
 
 #include <list>
 #include <memory>
@@ -22,6 +23,7 @@ public:
 private:
    SocketFD _sockFD;
    std::list<std::unique_ptr<TCPConn>> _connlist;
+   Admin _server_admin;
 };
 
 #endif

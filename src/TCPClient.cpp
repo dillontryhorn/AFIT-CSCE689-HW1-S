@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "exceptions.h"
+#include <strfuncts.h>
 
 /**********************************************************************************************
  * TCPClient (constructor) - Creates a Stdin file descriptor to simplify handling of user input. 
@@ -46,6 +47,7 @@ void TCPClient::connectTo(const char *ip_addr, unsigned short port) {
 
 void TCPClient::handleConnection() {
     int msg = 0;
+    bool input_hidden = false;
     while(1)
     {
         if( (msg = read( this->_stdinFD.getSockFD(), this->_buffer, socket_bufsize-1 ) ) == 0 ) //Always read first
@@ -57,17 +59,29 @@ void TCPClient::handleConnection() {
             throw socket_error("ERROR! Server message could not be read.");
         std::cout << this->_buffer << '\n';
 
-        std::string disconnect( this->_buffer );
-        if( disconnect.find("Disconnecting") == std::string::npos )
+        std::string key_message( this->_buffer );
+        if( key_message.find("Disconnecting") == std::string::npos )
         {
+            if( key_message.find("password") != std::string::npos )
+            {
+                HideStdinKeystrokes();
+                input_hidden = true;
+            }
             std::cout << ">> ";
             memset( &this->_buffer[0], 0, sizeof(this->_buffer) ); //Make sure buffer is empty
             std::cin >> this->_buffer;
+            
             if( !strncmp(this->_buffer, "exit", 5) ) //Disconnecting
                 break;
             msg = write( this->_stdinFD.getSockFD(), this->_buffer, strlen(this->_buffer) ); //Always write after read
             if( msg < 0 )
                 throw socket_error("ERROR! Message could not be written.");
+            if( input_hidden )
+            {
+                ShowStdinKeystrokes();
+                std::cout << std::endl;
+                input_hidden = false;
+            }
         }
         else
             break;
@@ -83,3 +97,4 @@ void TCPClient::handleConnection() {
 void TCPClient::closeConn() {
     this->_stdinFD.shutdown();
 }
+

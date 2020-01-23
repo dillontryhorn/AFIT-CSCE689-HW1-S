@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <termios.h>
+#include "unistd.h"
 #include "strfuncts.h"
 
 void clrNewlines(std::string &str) {
@@ -42,3 +43,26 @@ int hideInput(int fd, bool hide) {
    return 0;
 }
 
+void HideStdinKeystrokes()
+{
+    termios tty;
+
+    tcgetattr(STDIN_FILENO, &tty);
+
+    /* we want to disable echo */
+    tty.c_lflag &= ~ECHO;
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &tty);
+}
+
+void ShowStdinKeystrokes()
+{
+   termios tty;
+
+    tcgetattr(STDIN_FILENO, &tty);
+
+    /* we want to reenable echo */
+    tty.c_lflag |= ECHO;
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &tty);
+}

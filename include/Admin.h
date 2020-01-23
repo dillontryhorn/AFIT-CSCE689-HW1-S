@@ -8,8 +8,8 @@ class Admin
 {
     public:
         Admin();
-        Admin( const char *password_filename, const char *whitelist_filename );
-        Admin( const char *password_filename, const char *whitelist_filename, int hash_length, int salt_length );
+        Admin( const char *password_filename, const char *whitelist_filename, const char *log_filename );
+        Admin( const char *password_filename, const char *whitelist_filename, const char *log_filename, int hash_length, int salt_length );
         ~Admin();
 
         bool checkWhitelistIP( std::string ip_addr );
@@ -23,13 +23,17 @@ class Admin
 
         bool checkPassword( std::string username, std::string password );
         std::string changePassword( std::string username );
+        std::string changePassword( std::string username, std::string new_password );
         std::string hashPassword( std::string password );
+
+        void logger( std::string msg );
     private:
         std::ofstream _outFile;
         std::ifstream _inFile;
 
         const char *PASSWORD_FILENAME = "passwd";
         const char *WHITELIST_FILENAME = "whitelist";
+        const char *LOG_FILENAME = "server.log";
         uint32_t HASHLEN = 32;
         uint32_t SALTLEN = 16;
 };

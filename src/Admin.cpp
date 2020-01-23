@@ -1,5 +1,7 @@
 #include "Admin.h"
 #include <argon2.h>
+#include <chrono>
+#include <ctime>
 #include <cstring>
 #include <iomanip>
 #include <iostream>
@@ -10,13 +12,13 @@ Admin::Admin()
 {
 }
 
-Admin::Admin( const char *password_filename, const char *whitelist_filename ) : 
-    PASSWORD_FILENAME( password_filename ), WHITELIST_FILENAME( whitelist_filename )
+Admin::Admin( const char *password_filename, const char *whitelist_filename, const char *log_filename ) : 
+    PASSWORD_FILENAME( password_filename ), WHITELIST_FILENAME( whitelist_filename ), LOG_FILENAME( log_filename )
 {
 }
 
-Admin::Admin( const char *password_filename, const char *whitelist_filename, int hash_length, int salt_length ) :
-    PASSWORD_FILENAME( password_filename ), WHITELIST_FILENAME( whitelist_filename ),
+Admin::Admin( const char *password_filename, const char *whitelist_filename, const char *log_filename, int hash_length, int salt_length ) :
+    PASSWORD_FILENAME( password_filename ), WHITELIST_FILENAME( whitelist_filename ), LOG_FILENAME( log_filename ),
     HASHLEN( hash_length ), SALTLEN( salt_length )
 {
 }
@@ -219,6 +221,18 @@ std::string Admin::changePassword( std::string username )
     }
 }
 
+std::string Admin::changePassword( std::string username, std::string new_password )
+{
+    if( !Admin::checkUser( username ) )
+        return "User does not exist";
+    else
+    {
+        Admin::removeUser( username );
+        Admin::addUser( username, new_password );
+        return "Added User";
+    }
+}
+
 std::string Admin::hashPassword( std::string password )
 {
     /* MOST OF CODE TAKEN STRAIGHT FROM 
@@ -276,4 +290,15 @@ std::string Admin::hashPassword( std::string password )
         hashed_password << std::hex << static_cast<int>(hash2[i]);
 
     return hashed_password.str();
+}
+
+void Admin::logger( std::string msg )
+{
+    this->_outFile.open( this->LOG_FILENAME, std::ios_base::app );
+    if( this->_outFile )
+    {
+        std::time_t current_time = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now() );
+        this->_outFile << std::ctime( &current_time ) << msg << std::endl;
+    }
+    this->_outFile.close();
 }

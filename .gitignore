@@ -28,3 +28,4 @@ passwd
 whitelist
 config.h.in~
 my_adduser
+server.log

@@ -42,6 +42,7 @@ public:
    bool isConnected();
 
    sockaddr_in getIPAddr() { return _connfd.getIPAddr(); };
+   std::string getIPAddrStr() { return _ip_client; };
    int getConnFD() { return _connfd.getSockFD(); };
 
 private:
@@ -53,7 +54,7 @@ private:
 
    SocketFD _connfd;
  
-   std::string _username; // The username this connection is associated with
+   std::string _username = "NO USER"; // The username this connection is associated with
 
    std::string _newpwd; // Used to store user input for changing passwords
 
@@ -62,6 +63,8 @@ private:
    int _pwd_attempts = 0;
 
    Admin _server_admin;
+
+   std::string _ip_client;
 };
 
 

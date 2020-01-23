@@ -3,6 +3,7 @@
 #include <iostream>
 #include "exceptions.h"
 #include <stdexcept>
+#include <sstream>
 
 /*
  * TCPServer::listenSvr() uses the modified algorithm from the website given below to
@@ -31,6 +32,9 @@ void TCPServer::bindSvr(const char *ip_addr, short unsigned int port) {
     this->_sockFD = sockFD;
     this->_sockFD.setNonBlocking();
     this->_sockFD.bindFD( ip_addr, port );
+    std::stringstream ss;
+    ss << "Server bound to IP address: " << ip_addr << " and Port: " << port << std::endl;
+    this->_server_admin.logger( ss.str() );
 }
 
 /**********************************************************************************************
@@ -46,6 +50,7 @@ void TCPServer::listenSvr() {
     int activity, max_fd, fd;
 
     this->_sockFD.startListen();
+    this->_server_admin.logger( "Server started listening.\n" );
     std::cout << "Maximum Connections Allowed: " << max_connections << std::endl; //Notify server admin
 
     while(true)
@@ -76,7 +81,9 @@ void TCPServer::listenSvr() {
             {
                 std::unique_ptr<TCPConn> new_connection = TCPConn::New();
                 if( !new_connection->acceptConn( this->_sockFD ) )
+                {
                     std::cout << "Blocked Nonwhitelisted IP" << std::endl;
+                }
                 else
                 {
                     new_connection->startAuthentication();

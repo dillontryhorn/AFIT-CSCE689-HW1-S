@@ -12,4 +12,9 @@ void lower(std::string &str);
 // Turns off local echo from a user's terminal
 int hideInput(int fd, bool hide);
 
+// Turns off local echo from STDIN
+void HideStdinKeystrokes();
+
+// Turns on local echo from STDIN
+void ShowStdinKeystrokes();
 
