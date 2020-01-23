@@ -8,6 +8,12 @@
 #include <sstream>
 #include <vector>
 
+/**********************************************************************************************
+ * Admin (constructor) - Create admin object with parameters to change filenames and 
+ * salt/hash length
+ *
+ **********************************************************************************************/
+
 Admin::Admin()
 {
 }
@@ -27,6 +33,12 @@ Admin::~Admin()
 {
 }
 
+/**********************************************************************************************
+ * checkWhitelistIP - takes supplied IP string and returns true if in the 
+ *     whitelist file, if it exists
+ *
+ **********************************************************************************************/
+
 bool Admin::checkWhitelistIP( std::string ip_addr )
 {
     this->_inFile.open( this->WHITELIST_FILENAME );
@@ -35,7 +47,7 @@ bool Admin::checkWhitelistIP( std::string ip_addr )
         std::string line;
         while( getline( this->_inFile, line ) )
         {
-            if( line.compare( ip_addr ) == 0 )
+            if( line.compare( ip_addr ) == 0 ) //Match
                 return true;
         }
     }
@@ -43,9 +55,14 @@ bool Admin::checkWhitelistIP( std::string ip_addr )
     return false;
 }
 
+/**********************************************************************************************
+ * addWhitelistIP - takes supplied IP string and appends it to the whitelist file
+ *
+ **********************************************************************************************/
+
 void Admin::addWhitelistIP( std::string ip_addr )
 {
-    this->_outFile.open( this->WHITELIST_FILENAME, std::ios_base::app );
+    this->_outFile.open( this->WHITELIST_FILENAME, std::ios_base::app ); //Append
     if( this->_outFile )
     {
         this->_outFile << ip_addr << std::endl;
@@ -54,18 +71,24 @@ void Admin::addWhitelistIP( std::string ip_addr )
     this->_outFile.close();
 }
 
+/**********************************************************************************************
+ * removeWhitelistIP - takes supplied IP string and removes it from the whitelist file by
+ *      creating a new file without the string and renaming it
+ *
+ **********************************************************************************************/
+
 void Admin::removeWhitelistIP( std::string ip_addr )
 {
     bool exists = false;
     std::ofstream temp;
-    temp.open( "temp.txt" );
+    temp.open( "temp.txt" ); //Store all strings except supplied IP address in here and rename to new file
     this->_inFile.open( this->WHITELIST_FILENAME );
     if( this->_inFile )
     {
         std::string line;
         while( getline( this->_inFile, line ) )
         {
-            if( line.compare( ip_addr ) != 0 )
+            if( line.compare( ip_addr ) != 0 ) //Exact string match
                 temp << line << std::endl;
             else
             {
@@ -76,11 +99,17 @@ void Admin::removeWhitelistIP( std::string ip_addr )
     }
     this->_inFile.close();
     temp.close();
-    remove( this->WHITELIST_FILENAME );
+    remove( this->WHITELIST_FILENAME ); 
     rename( "temp.txt", this->WHITELIST_FILENAME );
     if( !exists )
         std::cout << ip_addr << " was not found in the whitelist file." << std::endl;
 }
+
+/**********************************************************************************************
+ * checkUser - uses supplied username string and checks for exact match in password file
+ *      return true if exists in file
+ *
+ **********************************************************************************************/
 
 bool Admin::checkUser( std::string username )
 {
@@ -92,14 +121,14 @@ bool Admin::checkUser( std::string username )
         std::string line;
         while( getline( this->_inFile, line ) )
         {
-            if( line.find( username ) != std::string::npos )
-            {
+            if( line.find( username ) != std::string::npos ) //found string match in line
+            { //need extra check for difference between tony and tony1
                 strings.clear();
                 std::istringstream user_line( line );
                 std::string token;    
                 while( getline(user_line, token, ':') )
                     strings.push_back( token );
-                if( strings.at(0).compare( username ) == 0 )
+                if( strings.at(0).compare( username ) == 0 ) //exact match
                     doesExist = true;
             }
         }
@@ -107,6 +136,12 @@ bool Admin::checkUser( std::string username )
     this->_inFile.close();
     return doesExist;
 }
+
+/**********************************************************************************************
+ * addUser - using supplied username, function prompts for password and verifies password
+ *     username and password hash appended to password file, return true if successful
+ *
+ **********************************************************************************************/
 
 bool Admin::addUser( std::string username )
 {
@@ -122,6 +157,12 @@ bool Admin::addUser( std::string username )
     return is_added;
 }
 
+/**********************************************************************************************
+ * addUser - takes supplied username and password, hashes password, and appends both to 
+ *      password file
+ *
+ **********************************************************************************************/
+
 bool Admin::addUser( std::string username, std::string password )
 {
     bool is_added = false;
@@ -136,6 +177,11 @@ bool Admin::addUser( std::string username, std::string password )
     return is_added;
 }
 
+/**********************************************************************************************
+ * removeUser - creates a new password file that does not contain supplied username
+ *
+ **********************************************************************************************/
+
 bool Admin::removeUser( std::string username )
 {
     bool deleted = false;
@@ -148,16 +194,16 @@ bool Admin::removeUser( std::string username )
         std::string line;
         while( getline( this->_inFile, line ) )
         {
-            if( line.find( username ) == std::string::npos )
+            if( line.find( username ) == std::string::npos ) //append lines that don't contain username
                 temp << line << std::endl;
             else
-            {
+            { //needs extra check for difference between e.g. tony and tony1
                 strings.clear();
                 std::istringstream user_line( line );
                 std::string token;    
                 while( getline(user_line, token, ':') )
                     strings.push_back( token );
-                if( strings.at(0).compare( username ) == 0 )
+                if( strings.at(0).compare( username ) == 0 ) //exact match
                 {
                     deleted = true;
                 }
@@ -174,6 +220,11 @@ bool Admin::removeUser( std::string username )
         std::cout << username << " was not found in the password file." << std::endl;
     return deleted;
 }
+
+/**********************************************************************************************
+ * checkPassword - checks supplied password of username with hash in password file
+ *
+ **********************************************************************************************/
 
 bool Admin::checkPassword( std::string username, std::string password )
 {
@@ -192,12 +243,18 @@ bool Admin::checkPassword( std::string username, std::string password )
         std::string token;    
         while( getline(user_line, token, ':') )
             strings.push_back( token );
-        if( strings.at(1).compare( Admin::hashPassword( password ) ) == 0 )
+        if( strings.at(1).compare( Admin::hashPassword( password ) ) == 0 ) //verify hashes are the same
             isSamePasswd = true;
     }
     this->_inFile.close();
     return isSamePasswd;
 }
+
+/**********************************************************************************************
+ * changePassword - prompts for password input and verification input,
+ *     changes password of supplied user if exists
+ *
+ **********************************************************************************************/
 
 std::string Admin::changePassword( std::string username )
 {
@@ -221,6 +278,11 @@ std::string Admin::changePassword( std::string username )
     }
 }
 
+/**********************************************************************************************
+ * changePassword - directly changes password of username if user exists, no prompt
+ *
+ **********************************************************************************************/
+
 std::string Admin::changePassword( std::string username, std::string new_password )
 {
     if( !Admin::checkUser( username ) )
@@ -232,6 +294,16 @@ std::string Admin::changePassword( std::string username, std::string new_passwor
         return "Added User";
     }
 }
+
+/**********************************************************************************************
+ * hashPassword - uses argon2 to hash a password string supplied to the function.
+ *     Performs a check to make sure the hash is correct, returns hash
+ *
+ * MOST OF CODE TAKEN STRAIGHT FROM 
+ * https://github.com/P-H-C/phc-winner-argon2
+ * Some code repurposed to integrate iostream and stringstream
+ * 
+ **********************************************************************************************/
 
 std::string Admin::hashPassword( std::string password )
 {
@@ -291,6 +363,11 @@ std::string Admin::hashPassword( std::string password )
 
     return hashed_password.str();
 }
+
+/**********************************************************************************************
+ * logger - Uses supplied message to print to a server log with a timestamp
+ *
+ **********************************************************************************************/
 
 void Admin::logger( std::string msg )
 {

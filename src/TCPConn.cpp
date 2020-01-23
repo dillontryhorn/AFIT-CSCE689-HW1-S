@@ -18,13 +18,24 @@ TCPConn::~TCPConn() {
 
 }
 
+/**********************************************************************************************
+ * New - Creates a unique pointer of TCPConn type
+ *
+ **********************************************************************************************/
+
 std::unique_ptr<TCPConn> TCPConn::New() {
     std::unique_ptr<TCPConn> connection = std::make_unique<TCPConn>();
     return std::move( connection );
 }
 
+/**********************************************************************************************
+ * acceptConn - accept client socket connection, accept only whitelisted clients and log
+ *      information to file and server console
+ *
+ **********************************************************************************************/
+
 bool TCPConn::acceptConn(SocketFD &server) {
-    struct sockaddr_in address = server.getIPAddr();
+    struct sockaddr_in address;
     int addrlen = sizeof( address );
     int new_conn;
     TCPConn::sleep();
@@ -54,12 +65,19 @@ bool TCPConn::acceptConn(SocketFD &server) {
     return false;
 }
 
+/**********************************************************************************************
+ * sendText - invokes the write command to send a message over the socket,
+ *      can be supplied with length of message or not
+ *
+ **********************************************************************************************/
+
 int TCPConn::sendText(const char *msg) { //Simpler than method below
     TCPConn::sleep();
     int success = write( getConnFD(), msg, strlen(msg) );
     if( success < 0 )
         throw socket_error("ERROR! Message could not be written.");
     TCPConn::sleep();
+    return 0;
 }
 
 int TCPConn::sendText(const char *msg, int size) { //More precise
@@ -68,7 +86,13 @@ int TCPConn::sendText(const char *msg, int size) { //More precise
     if( success < 0 )
         throw socket_error("ERROR! Message could not be written.");
     TCPConn::sleep();
+    return 0;
 }
+
+/**********************************************************************************************
+ * handleConnection - state control to direct client to proper functions
+ *
+ **********************************************************************************************/
 
 void TCPConn::handleConnection() {
     if( this->_status == s_username )
@@ -81,9 +105,20 @@ void TCPConn::handleConnection() {
         TCPConn::getMenuChoice(); //Sends message back  
 }
 
+/**********************************************************************************************
+ * startAuthentication - prompts client for username
+ *
+ **********************************************************************************************/
+
 void TCPConn::startAuthentication() {
     TCPConn::sendText( "Enter your username", 20 );
 }
+
+/**********************************************************************************************
+ * getUsername - reads username string from buffer and prompts client for password
+ *      sets state to s_passwd, logs if user is not found in the password file and disconnects
+ *
+ **********************************************************************************************/
 
 void TCPConn::getUsername() {
     this->_username.assign(this->_buffer);
@@ -101,6 +136,12 @@ void TCPConn::getUsername() {
         TCPConn::sendText( "User does not exist. Disconnecting.", 36 );
     }
 }
+
+/**********************************************************************************************
+ * getPasswd - reads in password from buffer and checks if it matches in the password file
+ *      disconnects after two incorrect attempts, else, sends client to menu
+ *
+ **********************************************************************************************/
 
 void TCPConn::getPasswd() {
     std::string passwd(this->_buffer);
@@ -133,9 +174,20 @@ void TCPConn::getPasswd() {
         TCPConn::sendMenu();
 }
 
+/**********************************************************************************************
+ * sendMenu - sends the menu with all possible commands to the client
+ *
+ **********************************************************************************************/
+
 void TCPConn::sendMenu() {
     TCPConn::sendText( "Welcome to Dillon Tryhorn's Server.\nList of commands:\nhello\nmenu\n1\n2\n3\n4\n5\npasswd\nexit", 87 );
 }
+
+/**********************************************************************************************
+ * changePassword - prompts for password and verification password, 
+ *      hashes the two and performs a check, returns to menu when finished
+ *
+ **********************************************************************************************/
 
 void TCPConn::getMenuChoice() { //All standard menu choices
     if( !strncmp(this->_buffer, "hello", 6) )
@@ -157,6 +209,12 @@ void TCPConn::getMenuChoice() { //All standard menu choices
     else
         TCPConn::sendText( "INVALID COMMAND", 16 );
 }
+
+/**********************************************************************************************
+ * changePassword - prompts for password and verification password, 
+ *      hashes the two and performs a check, returns to menu when finished
+ *
+ **********************************************************************************************/
 
 void TCPConn::changePassword() {
     if( this->_status == s_menu)
@@ -185,6 +243,11 @@ void TCPConn::changePassword() {
     }
 }
 
+/**********************************************************************************************
+ * disconnect - closes a socket and logs to the server log
+ *
+ **********************************************************************************************/
+
 void TCPConn::disconnect() {
     std::stringstream ss;
     ss << "Disconnected " << this->_username << " at IP: " << TCPConn::getIPAddrStr() << std::endl;
@@ -192,6 +255,12 @@ void TCPConn::disconnect() {
     if( close( getConnFD() ) < 0 )
         throw std::runtime_error("ERROR! Unable to disconnect.");
 }
+
+/**********************************************************************************************
+ * isConnected - checks if a client is still active on the socket and stores data to the buffer
+ *      logs inactive client to the server log
+ *
+ **********************************************************************************************/
 
 bool TCPConn::isConnected() {
     struct sockaddr_in address;
@@ -213,6 +282,11 @@ bool TCPConn::isConnected() {
     TCPConn::sleep();
     return true;
 }
+
+/**********************************************************************************************
+ * sleep - Lightens the load on the CPU by adding delays
+ *
+ **********************************************************************************************/
 
 void TCPConn::sleep() {
     std::this_thread::sleep_for( std::chrono::milliseconds(10) );
