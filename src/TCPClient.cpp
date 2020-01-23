@@ -62,7 +62,7 @@ void TCPClient::handleConnection() {
         std::string key_message( this->_buffer );
         if( key_message.find("Disconnecting") == std::string::npos )
         {
-            if( key_message.find("password") != std::string::npos )
+            if( key_message.find("password") != std::string::npos ) //Hide user input
             {
                 HideStdinKeystrokes();
                 input_hidden = true;
@@ -76,7 +76,7 @@ void TCPClient::handleConnection() {
             msg = write( this->_stdinFD.getSockFD(), this->_buffer, strlen(this->_buffer) ); //Always write after read
             if( msg < 0 )
                 throw socket_error("ERROR! Message could not be written.");
-            if( input_hidden )
+            if( input_hidden ) //Make user input show up again
             {
                 ShowStdinKeystrokes();
                 std::cout << std::endl;

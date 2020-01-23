@@ -4,6 +4,30 @@
 #include <string>
 #include <fstream>
 
+/******************************************************************************************
+ * Admin - Administrative class to manipulate the server and provide authentication help
+ *
+ *  	   Admin(): Public Constructor, Overloaded constructors allow for custom filenames and salt/hash length
+ *  	   ~Admin(Dest): Public Destructor
+ *
+ *  	   checkWhitelistIP - verify if supplied IP address string is in the whitelist file, return true if found
+ *         addWhitelistIP - add an IP address string to the whitelist file, no return
+ *         removeWhitelistIP - remove an IP address string from the whitelist file, no return
+ * 
+ *  	   checkUser - verify if supplied username string is in the password file, return true if found
+ *         addUser - adds user to password file with or without supplied password, prompts for password 
+ *             if none supplied, return true if added
+ *         removeUser - remove user from password file, return true if removed
+ *  	   
+ *         checkPassword - verifies if supplied password and username match the combination in the password file
+ *         changePassword - takes username or username and password, prompts for password if no password supplied
+ *             return a verification string
+ *         hashPassword - place supplied string through the Argon2 hashing algorithm, return hashed password
+ *          
+ *         logger - Logs a supplied message to defined log file with timestamp 	   
+ *
+ *****************************************************************************************/
+
 class Admin 
 {
     public:

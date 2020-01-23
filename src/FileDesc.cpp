@@ -27,11 +27,23 @@ SocketFD::~SocketFD() {
 
 }
 
+/**********************************************************************************************
+ * setNonBlocking - Applies non-blocking behavior to the File Descriptor
+ *
+ *    Throws: socket_error exception if failed. socket_error is a child class of runtime_error
+ **********************************************************************************************/
+
 void SocketFD::setNonBlocking() { //Allow for multiple connections
     int option = 1;
     if( setsockopt( this->_sockFD, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &option,  sizeof(option) ) < 0 )   
         throw socket_error("ERROR! Unable to set SocketFD to nonblocking."); 
 }
+
+/**********************************************************************************************
+ * bindFD - Binds the file descriptor to a supplied IP address and Port number
+ *
+ *    Throws: runtime_error exception if failed.
+ **********************************************************************************************/
 
 void SocketFD::bindFD(const char *ip_addr, short unsigned int port) { //Used for server
     bzero( (char *) &this->_serv_addr, sizeof(this->_serv_addr) ); //Clean junk data
@@ -42,6 +54,12 @@ void SocketFD::bindFD(const char *ip_addr, short unsigned int port) { //Used for
     if( bind( this->_sockFD, (struct sockaddr *) &this->_serv_addr, sizeof(_serv_addr) ) < 0)
         throw std::runtime_error("ERROR! SocketFD could not bind.");
 }
+
+/**********************************************************************************************
+ * connectTo - Used by a TCPClient to connect to a server socket.
+ *
+ *    Throws: socket_error exception if failed. socket_error is a child class of runtime_error
+ **********************************************************************************************/
 
 void SocketFD::connectTo(const char *ip_addr, unsigned short port) { //Used for client
     struct sockaddr_in server_address;
@@ -60,20 +78,35 @@ void SocketFD::connectTo(const char *ip_addr, unsigned short port) { //Used for 
         throw socket_error("ERROR! Connection unable to establish.");
 }
 
+/**********************************************************************************************
+ * startListen - starts listen command of the file descriptor and allows up to 3 simultaneous 
+ *  connection requests
+ *
+ *    Throws: runtime_error exception if failed.
+ **********************************************************************************************/
+
 void SocketFD::startListen() {
     if( listen( this->_sockFD, 3 ) < 0 )
         throw std::runtime_error("ERROR! SocketFD is unable to listen.");
 }
+
+/**********************************************************************************************
+ * shutdown - calls the close command of the file descriptor
+ *
+ *    Throws: runtime_error exception if failed.
+ **********************************************************************************************/
 
 void SocketFD::shutdown() {
     if( close( this->_sockFD ) < 0 )
         throw std::runtime_error("ERROR! Unable to close SocketFD.");
 }
 
+//Set SocketFD ID number
 void SocketFD::setSockFD(int val) {
     this->_sockFD = val;
 }
 
+//Set IP address of SocketFD
 void SocketFD::setIPAddr(sockaddr_in ip_addr) {
     this->_serv_addr = ip_addr;
 }

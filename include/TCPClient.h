@@ -5,8 +5,20 @@
 
 #include "TCPConn.h"
 
-// Unused
-// const unsigned int stdin_bufsize = 50;
+/******************************************************************************************
+ * TCPClient - Child class of Client, program that clients use to connect to the TCPServer
+ *
+ *  	   TCPClient(): Public Constructor
+ *  	   ~TCPClient(Dest): Public Destructor
+ *
+ *       connectTo - connects to a socket using a supplied IP address and port
+ *       handleConnection - communicates with the server socket to send and receive data
+ *       closeConn() - disconnect from the server socket 	   
+ *    
+ *       Exceptions - throws socket exceptions for recoverable errors and runtime errors for non-recoverable errors 	   
+ *
+ *****************************************************************************************/
+
 const unsigned int socket_bufsize = 100;
 
 class TCPClient : public Client

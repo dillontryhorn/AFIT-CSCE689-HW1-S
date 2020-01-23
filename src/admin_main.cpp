@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void displayHelp(const char *execname) {
+void displayHelp(const char *execname) { //Five possible examples
     cout << "Improper syntax. All possible examples shown below." << endl;
     cout << execname << " user add <username>" << endl;
     cout << execname << " user remove <username>" << endl;
@@ -26,13 +26,14 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
+    //Manipulating users
     if( !strncmp( argv[1], "user", 5 ) )
     {
         //Read in parameters from command line
         option = argv[2];
         username = argv[3];
 
-        Admin server_admin;
+        Admin server_admin; //Password file = "passwd", Whitelist file = "whitelist", Log file = "server.log"
 
         if( option.compare("add") == 0 )
         {
@@ -75,8 +76,10 @@ int main(int argc, char *argv[])
             }
         }
         else
-            displayHelp( argv[0] );
+            displayHelp( argv[0] ); //Invalid args
     }
+
+    //Manipulate Whitelisted IP addresses
     else if( !strncmp( argv[1], "ip", 3 ) )
     {
         //Read in parameters from command line
@@ -91,7 +94,7 @@ int main(int argc, char *argv[])
             ip_addr = argv[3];
         }
 
-        Admin server_admin;
+        Admin server_admin; //Password file = "passwd", Whitelist file = "whitelist", Log file = "server.log"
 
         if( option.compare("add") == 0 )
         {
@@ -109,7 +112,7 @@ int main(int argc, char *argv[])
         }
         else if( option.compare("remove") == 0 )
         {
-            try //Add IP to Whitelist
+            try //Remove IP from Whitelist
             {
                 server_admin.removeWhitelistIP( ip_addr );
             } catch (runtime_error &e)
@@ -119,10 +122,10 @@ int main(int argc, char *argv[])
             }
         }
         else
-            displayHelp( argv[0] );
+            displayHelp( argv[0] ); //Invalid args
     }
     else
-        displayHelp( argv[0] );
+        displayHelp( argv[0] ); //Invalid args
     
     exit(0);
 }

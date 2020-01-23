@@ -3,6 +3,27 @@
 
 #include <netinet/in.h>
 
+/******************************************************************************************
+ *  SocketFD - helper class to provide socket file descriptor functionality for the TCP Server
+ *
+ *  	   SocketFD(): Public Constructor
+ *         ~SocketFD(Dest): Public Destructor
+ *
+ *  	   setNonBlocking - modifies the socket to allow for non-blocking behavior
+ *         bindFD - binds the socket file descriptor to a specified port and IP address
+ *         connectTo - used for client to connect to a server
+ *         startListen - starts listening for the server
+ *         shutdown - Shuts down the server
+ * 
+ *         setSockFD - sets the file descriptor ID number for the global variable _sockFD
+ *         getSockFD - returns the int value of the socket file descriptor
+ *         setIPAddr - set the IP address of the FD
+ *         getIPAddr - return the IP address struct of the FD
+ * 
+ *         Exceptions: throws socket exceptions for recoverable errors and runtime errors for non-recoverable errors 	   
+ *
+ *****************************************************************************************/
+
 class SocketFD
 {
 public:

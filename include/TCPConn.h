@@ -13,6 +13,38 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 
+/******************************************************************************************
+ *  TCPConn - Helper class for TCPServer to help manage connections
+ *    handles and receives/sends data, performs authentication, checks for alive connections
+ *
+ *  	   TCPConn(): Public Constructor
+ *       ~TCPConn(Dest): Public Destructor
+ *       New - creates a unique pointer of a connection for handling
+ * 
+ *       acceptConn - binds a client to the server socket
+ *       
+ *       sendText - sends text data to the user with size of data
+ * 
+ *       handleConnection - based on state of connection, directs client to proper stage of authentication
+ *       startAuthentication - on startup, prompts for username, state -> s_username
+ *       getUsername - takes username from buffer and prompts for password, state -> s_passwd
+ *       getPassword - takes password from buffer and checks if the hash is correct, if not try again,
+ *          disconnect after max attempts, state -> s_menu
+ *       sendMenu - sends default command list to the client
+ *       getMenuChoice - sends appropriate response to client based on input, invalid input prompts for "INVALID COMMAND"
+ *       changePassword - allows user to change password with two matching inputs
+ *       sleep - allows the server to sleep for a few milliseconds to lighten the load on the CPU
+ *       
+ *       disconnect - Disconnects the client from the server
+ *       isConnected - verifies if a client is connected, takes incoming data into the buffer
+ *       
+ *       getIPAddr - get the IP address, either sockaddr_in or string
+ *       getConnFD - gets the file descriptor integer ID
+ *
+ *       Exceptions: throws socket exceptions for recoverable errors and runtime errors for non-recoverable errors 	   
+ *
+ *****************************************************************************************/
+
 const int max_attempts = 2;
 const int bufsize = 100;
 
@@ -34,7 +66,6 @@ public:
    void getPasswd();
    void sendMenu();
    void getMenuChoice();
-   void setPassword();
    void changePassword();
    void sleep();
 
@@ -54,7 +85,7 @@ private:
 
    SocketFD _connfd;
  
-   std::string _username = "NO USER"; // The username this connection is associated with
+   std::string _username = "NO USER"; // The username this connection is associated with, Default is "NO USER"
 
    std::string _newpwd; // Used to store user input for changing passwords
 

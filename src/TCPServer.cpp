@@ -80,13 +80,13 @@ void TCPServer::listenSvr() {
             if( this->_connlist.size() < max_connections ) //Allow connection to establish
             {
                 std::unique_ptr<TCPConn> new_connection = TCPConn::New();
-                if( !new_connection->acceptConn( this->_sockFD ) )
+                if( !new_connection->acceptConn( this->_sockFD ) ) //Not whitelisted, don't handle
                 {
                     std::cout << "Blocked Nonwhitelisted IP" << std::endl;
                 }
                 else
                 {
-                    new_connection->startAuthentication();
+                    new_connection->startAuthentication(); //Whitelisted
                     this->_connlist.push_back( std::move( new_connection ) );
                 }
             }
